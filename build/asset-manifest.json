@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/saoman/dragGame/static/css/main.bfa9bbc1.css",
-    "main.js": "/saoman/dragGame/static/js/main.e731402e.js",
-    "static/js/453.ed3810f9.chunk.js": "/saoman/dragGame/static/js/453.ed3810f9.chunk.js",
-    "index.html": "/saoman/dragGame/index.html",
-    "main.bfa9bbc1.css.map": "/saoman/dragGame/static/css/main.bfa9bbc1.css.map",
-    "main.e731402e.js.map": "/saoman/dragGame/static/js/main.e731402e.js.map",
-    "453.ed3810f9.chunk.js.map": "/saoman/dragGame/static/js/453.ed3810f9.chunk.js.map"
+    "main.css": "./static/css/main.bfa9bbc1.css",
+    "main.js": "./static/js/main.f238721b.js",
+    "static/js/453.ed3810f9.chunk.js": "./static/js/453.ed3810f9.chunk.js",
+    "index.html": "./index.html",
+    "main.bfa9bbc1.css.map": "./static/css/main.bfa9bbc1.css.map",
+    "main.f238721b.js.map": "./static/js/main.f238721b.js.map",
+    "453.ed3810f9.chunk.js.map": "./static/js/453.ed3810f9.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.bfa9bbc1.css",
-    "static/js/main.e731402e.js"
+    "static/js/main.f238721b.js"
   ]
 }
