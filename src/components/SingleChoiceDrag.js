@@ -2,8 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { DndProvider, useDrag, useDrop, useDragLayer } from 'react-dnd';
 import { HTML5Backend, getEmptyImage } from 'react-dnd-html5-backend';
 import { TouchBackend } from 'react-dnd-touch-backend';
-import './SingleChoiceDrag.css'; // 确保创建并导入这个CSS文件
+import './SingleChoiceDrag.css';
 
+// 检测是否为触摸设备
 const isTouchDevice = 'ontouchstart' in window;
 
 // 可拖动项组件
@@ -17,7 +18,7 @@ function DraggableItem({ item, type, isDropped }) {
     }),
   }));
 
-  // 使用空白图像作为拖动预览
+  // 使用空白图像作为拖动预览,以便自定义预览
   useEffect(() => {
     preview(getEmptyImage(), { captureDraggingState: true });
   }, [preview]);
@@ -74,10 +75,10 @@ function DragPreview() {
 function DropTarget({ onDrop, children, droppedItem }) {
   // 使用useDrop钩子设置放置逻辑
   const [{ isOver }, drop] = useDrop(() => ({
-    accept: 'item',
-    drop: (item) => onDrop(item.id),
+    accept: 'item', // 指定接受的拖动类型
+    drop: (item) => onDrop(item.id), // 处理放置事件
     collect: (monitor) => ({
-      isOver: !!monitor.isOver(),
+      isOver: !!monitor.isOver(), // 检测是否有项目悬停在放置区域上
     }),
   }));
 
