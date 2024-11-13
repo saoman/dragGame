@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { DndProvider, useDrag, useDrop, useDragLayer } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import { TouchBackend } from 'react-dnd-touch-backend';
@@ -15,7 +15,7 @@ const DraggableItem = ({ element, children, style }) => {
     item: () => {
       return element;
     },
-    end: (item,monitor) => {
+    end: (item, monitor) => {
       const dropResult = monitor.getDropResult();
       if (dropResult && dropResult.dropped) {
         if (dropResult.success) {
@@ -64,11 +64,18 @@ const DraggableItem = ({ element, children, style }) => {
 
 // 可放置的目标组件
 const DropTarget = ({ element, children, style, onDrop, onInvalidDrop }) => {
+  const elementRef = useRef(element);
+  useEffect(() => {
+    elementRef.current = element;
+  }, [element]);
+
   const [{ isOver }, drop] = useDrop(() => ({
     accept: ['ELEMENT'],  // 接受所有类型的拖动项
-    canDrop: () => true,  // 允许所有项目尝试放置
+    // canDrop: () => true,  // 允许所有项目尝试放置
     drop: (draggedItem) => {
-      if (element.isDropped) return;
+      console.log('DropTarget 被调用', draggedItem, element);
+      const currentElement = elementRef.current;
+      if (currentElement.isDropped) return;
       if (draggedItem.group === element.group) {
         // 组别匹配，执行正常的放置操作
         onDrop(draggedItem, element);
@@ -141,7 +148,8 @@ const DragPreview = () => {
 
 // 游戏元素组件
 const GameElement = React.memo(({ element, onDrop, onInvalidDrop, triggerElementActions }) => {
-  // console.log('渲染 GameElement:', element);
+  // console.log('GameElement 渲染', element, element.id);
+  const [isActive, setIsActive] = useState(false);
   const { resource, lefts, tops, levels, event, clicks } = element;
   const style = {
     position: 'absolute',
@@ -151,18 +159,28 @@ const GameElement = React.memo(({ element, onDrop, onInvalidDrop, triggerElement
     width: `${resource.withs}px`,
     height: `${resource.highs}px`,
     id: element.id,
+    transform: isActive ? 'scale(1.05)' : 'scale(1)',
+    transition: 'transform 0.2s',
   };
 
-  const handleClick = () => {
+  const handleTouchStart = () => {
+    setIsActive(true);
+  }
+  const handleTouchEnd = () => {
     if (event === EVENT_TYPES.CLICKABLE && clicks) {
-      // console.log(`点击了元素: ${resource.names}`);
       triggerElementActions(clicks);
     }
-  };
+    setIsActive(false);
+  }
 
-  // 根据元素类型渲染不同的内容
   const renderContent = () => {
-    const handleClickIfNeeded = event === EVENT_TYPES.CLICKABLE ? { onClick: handleClick } : {};
+    const handleClickIfNeeded = event === EVENT_TYPES.CLICKABLE ? {
+      onTouchStart: handleTouchStart,
+      onTouchEnd: handleTouchEnd,
+      onMouseDown: handleTouchStart,
+      onMouseUp: handleTouchEnd,
+    } : {};
+
     const newStyle = (event === EVENT_TYPES.DRAGGABLE || event === EVENT_TYPES.DROPPABLE) ? {
       ...style,
       width: '100%',
@@ -171,6 +189,7 @@ const GameElement = React.memo(({ element, onDrop, onInvalidDrop, triggerElement
       top: '0',
       position: 'static'
     } : style;
+
     switch (resource.rtype) {
       case RESOURCE_TYPES.IMAGE:
       case RESOURCE_TYPES.GIF:
@@ -187,10 +206,11 @@ const GameElement = React.memo(({ element, onDrop, onInvalidDrop, triggerElement
           fontSize: `${resource.fontsize}px`,
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'flex-start',
+          justifyContent: 'center',
           paddingLeft: '10px',
           border: `${resource.framewide}px solid ${resource.framecolor}`,
           boxSizing: 'border-box',
+          fontWeight: '600',
         };
         return <div style={textStyle} {...handleClickIfNeeded}>{resource.names}</div>;
       default:
@@ -218,15 +238,21 @@ const GameElement = React.memo(({ element, onDrop, onInvalidDrop, triggerElement
 });
 
 // 主游戏组件
-const DragGame = React.memo(({ config }) => {
+const DragGame = React.memo(({ config, configIndex, switchGame }) => {
+  const nextConfigIndex = configIndex + 1; // 下一页游戏配置索引
   const [isSuccessAnimationPlayed, setIsSuccessAnimationPlayed] = useState(false);
 
   // 初始化游戏元素状态
   const [elements, setElements] = useState(() => {
-    const addGroup = (element) => ({
-      ...element,
-      group: String(element.group || element.id)
-    });
+    const addGroup = (element) => {
+      if (!element.group) {
+        console.error(`错误: 元素 ${element.id || '未知'} 缺少 group 属性!!`);
+      }
+      return {
+        ...element,
+        group: String(element.group || element.id)
+      };
+    };
 
     const triggersWithGroup = (config.triggers || []).map(addGroup);
     const releasesWithGroup = (config.releases || []).map(addGroup);
@@ -286,7 +312,7 @@ const DragGame = React.memo(({ config }) => {
           playAudio(element.resource.paths);
           break;
         case RESOURCE_TYPES.IMAGE:
-          const existingElement = document.getElementById(`element-${element.id}`);
+          const existingElement = document.getElementById(element.id);
           if (existingElement) {
             handleUpdateElement(element);
           } else {
@@ -310,6 +336,7 @@ const DragGame = React.memo(({ config }) => {
           return { ...element, lefts: droppedElement.lefts, tops: droppedElement.tops };
         }
         if (element.id === droppedElement.id) {
+          console.log('元素被放置', element);
           return { ...element, isDropped: true };
         }
         return element;
@@ -327,7 +354,8 @@ const DragGame = React.memo(({ config }) => {
 
   // 监听elements变化，检查游戏是否完成
   useEffect(() => {
-    if(elements.length === 0) return;
+    // console.log('elements更新了', elements);
+    if (elements.length === 0) return;
     const allTargetsDropped = elements
       .filter(element => element.event === EVENT_TYPES.DROPPABLE)
       .every(target => target.isDropped);
@@ -338,6 +366,7 @@ const DragGame = React.memo(({ config }) => {
         triggerElementActions(config.sucess);
         setIsSuccessAnimationPlayed(true); // 标记动画已播放
       }, 0);
+      switchGame(nextConfigIndex); // 切换游戏
     }
   }, [elements, triggerElementActions, config.sucess, isSuccessAnimationPlayed]);
 

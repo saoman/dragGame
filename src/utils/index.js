@@ -59,10 +59,10 @@ export function prefetchResources(resources) {
       document.head.appendChild(link);
       console.log(`预加载图片资源: ${resource}`);
     } else if (resourceType === 'audio') {
+      // 音频资源预加载
       const audio = new Audio();
       audio.preload = 'auto';
       audio.src = resource;
-      console.log(`预加载音频资源: ${resource}`);
     } else {
       console.warn(`不支持的资源类型: ${resource}`);
     }
@@ -73,19 +73,12 @@ export function prefetchResources(resources) {
 let currentAudio = null;
 
 // 播放音频并管理当前播放状态
-export function playAudio(src) {
-  // 如果有正在播放的音频，停止它
-  if (currentAudio) {
-    currentAudio.pause();
-    currentAudio.currentTime = 0;
+export function playAudio(url) {
+  const audioElement = document.getElementById('globalAudio');
+  console.log('playAudio', url, audioElement);
+  if (audioElement) {
+    audioElement.src = url;
+    audioElement.muted = false;
+    audioElement.play().catch(error => console.error('音频播放失败:', error));
   }
-  
-  // 创建并播放新的音频
-  currentAudio = new Audio(src);
-  currentAudio.play().catch(error => console.error('音频播放失败:', error));
-  
-  // 音频播放结束时重置currentAudio
-  currentAudio.onended = () => {
-    currentAudio = null;
-  };
 }

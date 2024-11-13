@@ -1,53 +1,38 @@
-.printContain {
-  display: inline-flex;
-  flex-direction: column;
-  margin: 0 auto;
+@keyframes myAnimation {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
-.printContain line {
-  stroke: red;
-  stroke-width: 2;
+.printContain {
+  width: 100%;
   height: 100%;
 }
 
-.printContain img {
-  display: inline-block;
-  margin-right: 50px;
-}
-
 .printContain #svgContain {
-  /* width: 100%; */
-  height: 100px;
-  position: relative;
-  z-index: 0;
+  position: absolute;
+  width: 100%;
+  z-index: 1;
+  left: 0;
 }
 
 .printContain .imgGroup {
-  position: relative;
   z-index: 10;
-  height: 100px;
 }
-.printContain .scaleImg{
+
+.printContain .scaleImg {
   transform-origin: center;
-  /* transform: scale(1.2) ; */
-  animation: myAnimation .5s ease-in-out;
+  animation: myAnimation 1s ease;
 }
-.printContain .lastItem{
-  margin-right: 0;
-}
-@keyframes myAnimation {
- 0% {
-   transform: scale(1) ;
-   opacity: 1;
- }
- 50% {
-   transform: scale(1.2) ;
-   opacity: .8;
 
- }
- 100% {
-   transform: scale(1);
-   opacity: 1;
-
- }
+.targetGroup {
+  user-select: none;
 }
