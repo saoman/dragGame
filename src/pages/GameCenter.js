@@ -9,8 +9,8 @@ import { prefetchConfigResources } from '../utils';
 import { getGameList } from '../services/GameCenter';
 import { GAME_TYPES } from '../constants/gameTypes';
 import backBtn from '../images/back.png';
-import VConsole from 'vconsole';
-const vConsole = new VConsole();
+// import VConsole from 'vconsole';
+// const vConsole = new VConsole();
 const GameCenter = () => {
   const [allGameList, setAllGameList] = useState([]); // 所有游戏列表
   const [configIndex, setConfigIndex] = useState(0); // 当前配置索引
@@ -22,29 +22,9 @@ const GameCenter = () => {
   useEffect(() => {
     const fetchConfig = async () => {
       try {
-        // 获取 URL 参数中的 pageid，默认为 '5'
         const searchParams = new URLSearchParams(location.search);
         const pageid = searchParams.get('pageid') || null; // || '201';
         const resourceid = searchParams.get('resourceid')  || '1';
-
-        // 根据当前路径选择不同的 API 端点
-        const pathname = location.pathname;
-        let url = '/miniapp/wx/cartoon/game';
-
-        switch (pathname) {
-          case '/draggame':
-            url = '/miniapp/wx/cartoon/game';
-            break;
-          case '/linegame':
-            url = '/miniapp/wx/cartoon/game';
-            break;
-          case '/chiocegame':
-            url = '/miniapp/wx/cartoon/game';
-            break;
-          default:
-            // 保持默认值
-            break;
-        }
 
         // 获取游戏列表
         const gameList = await getGameList({
@@ -56,10 +36,7 @@ const GameCenter = () => {
           return;
         }
         setAllGameList(gameList);
-        // 发送 GET 请求获取配置
-        // const response = await get(url, { pageid });
         const response = gameList[configIndex];
-        // const response = data;
         console.log('response', response);
         setConfig(response);
 
@@ -178,12 +155,6 @@ const GameCenter = () => {
             />
             <Routes>
               <Route path="/" element={GameComponent()} />
-              {/* <Route path="/" element={<LineGame config={config} />} />
-              <Route path="/draggame" element={<DragGame config={config} />} />
-              <Route path="/linegame" element={<LineGame config={config} />} />
-              <Route path="/choicegame" element={<ChoiceGame config={config} />} />
-              <Route path="/clicktoselectgame" element={<ClickToSelectGame config={config} />} />
-              <Route path="/colorgame" element={<ColorGame config={config} />} /> */}
             </Routes>
           </>
         ) : (
