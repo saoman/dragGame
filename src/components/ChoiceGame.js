@@ -14,44 +14,42 @@ const GameElement = React.memo(({ element, onElementClick, isSelected, triggerEl
     height: `${resource.highs}px`,
   };
 
-  // 添加状态来控制缩放
   const [isPressed, setIsPressed] = useState(false);
 
   const handleTouchStart = (e) => {
-    // 当点击时设置 isPressed 为 true
     if (event === EVENT_TYPES.CLICKABLE) {
       setIsPressed(true);
     }
   };
 
   const handleTouchEnd = (e) => {
-    // 当释放时设置 isPressed 为 false
     if (event === EVENT_TYPES.CLICKABLE) {
       setIsPressed(false);
     }
     onElementClick(element);
   };
-  const handleClickIfNeeded = (event === EVENT_TYPES.CLICKABLE || event === EVENT_TYPES.CHOICEABLE)? { 
+
+  const handleClickIfNeeded = (event === EVENT_TYPES.CLICKABLE || event === EVENT_TYPES.CHOICEABLE) ? {
     onTouchStart: handleTouchStart,
     onTouchEnd: handleTouchEnd,
   } : {};
+
   const renderContent = () => {
     const newStyle = {
       ...style,
-      // 添加缩放效果
       transform: isPressed ? 'scale(1.05)' : 'scale(1)',
       transition: 'transform 0.1s ease',
-      transformOrigin: 'center center', 
+      transformOrigin: 'center center',
     };
 
     switch (resource.rtype) {
       case RESOURCE_TYPES.IMAGE:
       case RESOURCE_TYPES.GIF:
       case RESOURCE_TYPES.BACKGROUND:
-        if(event === EVENT_TYPES.CHOICEABLE) {
+        if (event === EVENT_TYPES.CHOICEABLE) {
           return (
-            <div 
-              style={newStyle} 
+            <div
+              style={newStyle}
               {...handleClickIfNeeded}
               data-group={group}
             >
@@ -89,21 +87,21 @@ const GameElement = React.memo(({ element, onElementClick, isSelected, triggerEl
 });
 
 const ChoiceGame = React.memo(({ config, configIndex, switchGame }) => {
-  const nextConfigIndex = configIndex + 1; // 下一页游戏配置索引
+  const nextConfigIndex = configIndex + 1;
   const [elements, setElements] = useState([...config.initelements, ...config.groups] || []);
   const [selectedElements, setSelectedElements] = useState([]);
-  const [isGameComplete, setIsGameComplete] = useState(false);
 
-  const handleAddElement = (newElement) => {
+  const handleAddElement = useCallback((newElement) => {
     setElements(prevElements => [...prevElements, newElement]);
-  };
+  }, []);
 
-  const handleRemoveElement = (elementId) => {
+  const handleRemoveElement = useCallback((elementId) => {
     setElements(prevElements => prevElements.filter(el => el.id !== elementId));
-  };
+  }, []);
 
   const triggerElementActions = useCallback((actions) => {
-    console.log("🚀 ~ triggerElementActions ~ triggerElementActions:", triggerElementActions)
+    if (!Array.isArray(actions)) return;
+
     actions.forEach(element => {
       switch (element.rtype) {
         case RESOURCE_TYPES.GIF:
@@ -116,34 +114,34 @@ const ChoiceGame = React.memo(({ config, configIndex, switchGame }) => {
         case RESOURCE_TYPES.IMAGE:
           handleAddElement(element);
           break;
-        default:
-          break;
       }
     });
+  }, [handleAddElement, handleRemoveElement]);
+
+  const checkIfCorrect = useCallback((selectedElements) => {
+    return selectedElements.every((element, index, array) =>
+      index === 0 || element.group === array[index - 1].group
+    );
   }, []);
 
-  const handleElementClick = (element) => {
+  const handleElementClick = useCallback((element) => {
     if (element.event === EVENT_TYPES.CHOICEABLE) {
       setSelectedElements(prev => {
-        const newSelected = prev.includes(element) 
+        const newSelected = prev.includes(element)
           ? prev.filter(e => e !== element)
           : [...prev, element];
-        
+
         if (newSelected.length >= 2) {
-          console.log("🚀 ~ handleElementClick ~ newSelected:", newSelected)
           const isCorrect = checkIfCorrect(newSelected);
-          console.log("🚀 ~ handleElementClick ~ isCorrect:", isCorrect)
-          
-          // 使用 setTimeout 延迟1秒执行
+
           setTimeout(() => {
             if (isCorrect) {
               triggerElementActions(element.oks);
               triggerElementActions(config.sucess);
-              setTimeout(() => switchGame(nextConfigIndex), 1000); // 延迟1秒后 切换游戏
+              setTimeout(() => switchGame(nextConfigIndex), 1000);
             } else {
               triggerElementActions(element.erros);
             }
-            // 在动作执行后清空选中状态
             setSelectedElements([]);
           }, 1000);
         }
@@ -152,13 +150,7 @@ const ChoiceGame = React.memo(({ config, configIndex, switchGame }) => {
     } else if (element.event === EVENT_TYPES.CLICKABLE) {
       triggerElementActions(element.clicks);
     }
-  };
-
-  const checkIfCorrect = (selectedElements) => {
-    return selectedElements.every((element, index, array) => 
-      index === 0 || element.group === array[index - 1].group
-    );
-  };
+  }, [checkIfCorrect, triggerElementActions, config.sucess, nextConfigIndex, switchGame]);
 
   return (
     <div className={styles.gameContainer}>

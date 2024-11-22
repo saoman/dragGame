@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, history } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import DragGame from '../components/DragGame';
 import LineGame from "../components/LineGame"
@@ -145,14 +145,6 @@ const GameCenter = () => {
         {config ? (
           <>
             {/* 返回按钮 */}
-            <img 
-              src={backBtn} 
-              alt="返回按钮" 
-              style={{position: 'absolute', top: '10px', left: '19px', zIndex: 9999}}
-              onTouchEnd={() => {
-                history.back();
-              }}
-            />
             <Routes>
               <Route path="/" element={GameComponent()} />
             </Routes>
