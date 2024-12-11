@@ -2,7 +2,7 @@
   "name": "my-app",
   "version": "0.1.0",
   "private": true,
-  "homepage": ".",
+  "homepage": "https://saoman.github.io/dragGame",
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
@@ -25,7 +25,8 @@
     "build:dev": "NODE_ENV=development react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "deploy": "react-scripts build && rm -rf docs && cp -r build docs"
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
@@ -45,5 +46,8 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://a.rms.lelequ.net"
+  "proxy": "http://a.rms.lelequ.net",
+  "devDependencies": {
+    "gh-pages": "^6.2.0"
+  }
 }

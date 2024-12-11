@@ -1,4 +1,18 @@
-### node版本 v18.20.4
+# 拖拽游戏 (Drag Game)
+
+## 项目介绍
+这是一个基于React开发的手机端拖拽游戏项目。
+
+## 在线演示
+- 演示地址：[https://saoman.github.io/dragGame](https://saoman.github.io/dragGame)
+
+## 环境要求
+- Node.js 版本: v18.20.4
+- npm 或 yarn
+
+## 快速开始
+
+### 安装依赖
 
 
 
