@@ -1,16 +1,16 @@
 {
   "files": {
     "main.css": "/dragGame/static/css/main.38b80e52.css",
-    "main.js": "/dragGame/static/js/main.735f04e3.js",
+    "main.js": "/dragGame/static/js/main.32fc5ea2.js",
     "static/js/453.ed3810f9.chunk.js": "/dragGame/static/js/453.ed3810f9.chunk.js",
     "static/media/loading.gif": "/dragGame/static/media/loading.ce0ca099063c763ca008.gif",
     "index.html": "/dragGame/index.html",
     "main.38b80e52.css.map": "/dragGame/static/css/main.38b80e52.css.map",
-    "main.735f04e3.js.map": "/dragGame/static/js/main.735f04e3.js.map",
+    "main.32fc5ea2.js.map": "/dragGame/static/js/main.32fc5ea2.js.map",
     "453.ed3810f9.chunk.js.map": "/dragGame/static/js/453.ed3810f9.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.38b80e52.css",
-    "static/js/main.735f04e3.js"
+    "static/js/main.32fc5ea2.js"
   ]
 }
