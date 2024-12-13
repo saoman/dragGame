@@ -148,6 +148,7 @@ const DragPreview = () => {
 
 // 游戏元素组件
 const GameElement = React.memo(({ element, onDrop, onInvalidDrop, triggerElementActions }) => {
+  console.log('渲染游戏元素:', element);
   // console.log('GameElement 渲染', element, element.id);
   const [isActive, setIsActive] = useState(false);
   const { resource, lefts, tops, levels, event, clicks } = element;
@@ -239,14 +240,17 @@ const GameElement = React.memo(({ element, onDrop, onInvalidDrop, triggerElement
 
 // 主游戏组件
 const DragGame = React.memo(({ config, configIndex, switchGame }) => {
+  console.log('DragGame 组件渲染:', { config, configIndex });
+
   const nextConfigIndex = configIndex + 1; // 下一页游戏配置索引
   const [isSuccessAnimationPlayed, setIsSuccessAnimationPlayed] = useState(false);
 
   // 初始化游戏元素状态
   const [elements, setElements] = useState(() => {
+    console.log('初始化 elements 状态');
     const addGroup = (element) => {
       if (!element.group) {
-        console.error(`错误: 元素 ${element.id || '未知'} 缺少 group 属性!!`);
+        console.log('警告: 元素缺少 group 属性:', element);
       }
       return {
         ...element,
@@ -256,6 +260,12 @@ const DragGame = React.memo(({ config, configIndex, switchGame }) => {
 
     const triggersWithGroup = (config.triggers || []).map(addGroup);
     const releasesWithGroup = (config.releases || []).map(addGroup);
+    
+    console.log('合并元素:', {
+      initelements: config.initelements || [],
+      triggers: triggersWithGroup,
+      releases: releasesWithGroup
+    });
 
     const combinedElements = [
       ...(config.initelements || []),
@@ -263,13 +273,13 @@ const DragGame = React.memo(({ config, configIndex, switchGame }) => {
       ...releasesWithGroup
     ];
 
-    return combinedElements.map((element, index) => ({
-      ...element,
-      id: element.id || `element-${index}`
-    }));
+    return combinedElements;
   });
 
-
+  // 监听 elements 变化
+  useEffect(() => {
+    console.log('elements 状态更新:', elements);
+  }, [elements]);
 
   // 处理添加新元素
   const handleAddElement = (newElement) => {
@@ -327,7 +337,7 @@ const DragGame = React.memo(({ config, configIndex, switchGame }) => {
 
   // 处理元素放置
   const handleDrop = (draggedItem, droppedElement) => {
-    // console.log('handleDrop 被调用', draggedItem, droppedElement);
+    console.log('拖放事件触发:', { draggedItem, droppedElement });
     triggerElementActions(droppedElement.oks);
     // 更新元素位置
     setElements(prevElements => {
@@ -348,7 +358,7 @@ const DragGame = React.memo(({ config, configIndex, switchGame }) => {
 
   // 处理无效放置
   const handleInvalidDrop = (draggedItem, targetElement) => {
-    // console.log('无效放置:', draggedItem, targetElement);
+    console.log('无效拖放:', { draggedItem, targetElement });
     triggerElementActions(targetElement.erros);
   };
 
@@ -373,15 +383,19 @@ const DragGame = React.memo(({ config, configIndex, switchGame }) => {
   return (
     <DndProvider backend={TouchBackend}>
       <div className={styles.gameContainer}>
-        {elements.map(element => (
-          <GameElement
-            key={element.id}
-            element={element}
-            onDrop={handleDrop}
-            onInvalidDrop={handleInvalidDrop}
-            triggerElementActions={triggerElementActions}
-          />
-        ))}
+        {elements.length === 0 ? (
+          <div>没有元素被渲染</div>
+        ) : (
+          elements.map(element => (
+            <GameElement
+              key={element.id}
+              element={element}
+              onDrop={handleDrop}
+              onInvalidDrop={handleInvalidDrop}
+              triggerElementActions={triggerElementActions}
+            />
+          ))
+        )}
       </div>
       <DragPreview />
     </DndProvider>

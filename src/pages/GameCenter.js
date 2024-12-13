@@ -112,6 +112,9 @@ const GameCenter = () => {
 
   // 渲染组件
   const GameComponent = () => {
+    console.log('完整配置信息 config ===>', config);
+    console.log('当前游戏类型 config.gametype ===>', config.gametype);
+    console.log('游戏类型常量 GAME_TYPES ===>', GAME_TYPES);
     switch (config.gametype) {
       case GAME_TYPES.SINGLECHOICE:
         return <ClickToSelectGame key={config.pagenum} config={config} configIndex={configIndex} switchGame={switchGame} />;    
@@ -146,7 +149,7 @@ const GameCenter = () => {
           <>
             {/* 返回按钮 */}
             <Routes>
-              <Route path="/" element={GameComponent()} />
+              <Route path="*" element={GameComponent()} />
             </Routes>
           </>
         ) : (
